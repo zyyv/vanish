@@ -1,6 +1,6 @@
 {
   "name": "@zyyv/vanish",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "A reversible WebGL particle disintegration effect for Vue 3.",
   "type": "module",
   "files": [

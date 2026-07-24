@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm -C packages/vanish run dev",
-    "build": "pnpm -r --parallel run build",
+    "build": "pnpm -r run build",
     "play": "pnpm -C playground run dev",
     "deploy:playground": "pnpm -C playground run build && wrangler deploy",
     "release": "bumpp -r --execute=\"pnpm i\"",

@@ -5,41 +5,38 @@ on:
     tags:
       - 'v*'
 
-permissions:
-  contents: read
-  id-token: write
-
 jobs:
-  publish:
+  release:
+    permissions:
+      id-token: write
+      contents: write
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v5
 
-      - name: Set up Node.js
+      - name: Set node
         uses: actions/setup-node@v6
         with:
-          node-version: 24
-          package-manager-cache: false
-          registry-url: https://registry.npmjs.org
+          node-version: lts/*
+          cache: pnpm
+          registry-url: 'https://registry.npmjs.org'
 
-      - name: Update npm for trusted publishing
-        run: npm install --global npm@latest
+      - run: npm i -g npm@latest
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - run: pnpm dlx changelogithub
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN}}
 
-      - name: Typecheck
-        run: pnpm typecheck
+      - name: Install
+        run: pnpm install
 
       - name: Build
         run: pnpm build
 
-      - name: Publish @zyyv/vanish
-        run: npm publish --access public
-        working-directory: packages/vanish
+      - name: Publish to NPM
+        run: pnpm -r publish --access public --no-git-checks

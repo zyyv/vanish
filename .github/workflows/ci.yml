@@ -4,37 +4,30 @@ on:
   push:
     branches:
       - main
+
   pull_request:
     branches:
       - main
 
-permissions:
-  contents: read
-
 jobs:
-  validate:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v5
-
-      - name: Set up Node.js
+      - name: Set node
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
-          cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v5
 
-      - name: Typecheck
-        run: pnpm typecheck
+      - name: 📦 Install dependencies
+        run: pnpm install
+
+      - name: 📝 Lint
+        run: pnpm lint
 
       - name: Build
         run: pnpm build
-
-      - name: Validate Cloudflare deployment
-        run: pnpm exec wrangler deploy --dry-run

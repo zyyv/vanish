@@ -7,11 +7,11 @@ import {
   useTemplateRef,
   watch,
 } from 'vue'
-import { WebGLVanishRenderer } from '../lib/webglVanishRenderer'
+import { WebGLVanishRenderer } from './webglVanishRenderer'
 import type {
   SourceSize,
   VanishConfiguration,
-} from '../types'
+} from './types'
 
 const props = defineProps<{
   progress: number

@@ -211,10 +211,35 @@ playground       使用 workspace 包的 Vite 演示与调参页面
 
 ```sh
 pnpm install
-pnpm dev          # 先构建包，再启动包监听和 playground
-pnpm typecheck    # 检查两个 workspace
-pnpm build        # 构建 npm 包和 playground
-pnpm pack:vanish  # 生成发布前 tarball
+pnpm dev          # 监听构建 @zyyv/vanish
+pnpm play         # 启动 playground
+pnpm typecheck    # 检查 @zyyv/vanish
+pnpm build        # 并行构建所有 workspace
+```
+
+## 持续集成、部署与发布
+
+GitHub Actions 会在 pull request 和 `main` 分支 push 时执行类型检查、构建以及 Wrangler dry-run。`main` 分支还会自动把 `playground/dist` 部署为 Cloudflare Workers Static Assets。
+
+在 GitHub 仓库的 **Settings → Secrets and variables → Actions** 中配置：
+
+- `CLOUDFLARE_ACCOUNT_ID`：Cloudflare account ID
+- `CLOUDFLARE_API_TOKEN`：权限限制到目标账号的 Workers 编辑 token
+
+npm 发布使用 npm Trusted Publishing。请在 npm 的 `@zyyv/vanish` 包设置中添加本 GitHub 仓库，并把 workflow filename 配置为 `release.yml`，允许执行 `npm publish`。
+
+发布新版本时，在干净且最新的 `main` 分支运行：
+
+```sh
+pnpm release
+```
+
+`bumpp` 会同步更新 workspace 版本与 lockfile，创建 release commit 和 `v*` tag，并推送到 GitHub。tag 会触发 GitHub Actions 构建并发布 `@zyyv/vanish`。
+
+也可以在本地验证或手动部署：
+
+```sh
+pnpm deploy:playground  # 构建 playground 并部署到 Cloudflare
 ```
 
 ## Credits

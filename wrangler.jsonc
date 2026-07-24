@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "vanish",
+  "compatibility_date": "2026-07-24",
+  "assets": {
+    "directory": "./playground/dist",
+    "not_found_handling": "single-page-application"
+  }
+}

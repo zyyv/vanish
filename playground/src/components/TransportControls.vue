@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import {
-  PhArrowCounterClockwise as ArrowCounterClockwise,
-  PhWind as Wind,
-} from '@phosphor-icons/vue'
 import ControlSlider from './ControlSlider.vue'
 
-const props = defineProps<{
+defineProps<{
   progress: number
   duration: number
   labels: {
@@ -36,17 +32,17 @@ const updateDuration = (value: number | undefined) => {
   <section class="panel transport-panel">
     <div class="transport-actions">
       <button class="action-button primary" type="button" @click="emit('disintegrate')">
-        <Wind :size="18" weight="bold" />
+        <span class="action-mark" aria-hidden="true">→</span>
         {{ labels.disintegrate }}
       </button>
       <button class="action-button secondary" type="button" @click="emit('reassemble')">
-        <ArrowCounterClockwise :size="18" weight="bold" />
+        <span class="action-mark" aria-hidden="true">↩</span>
         {{ labels.reassemble }}
       </button>
     </div>
 
     <ControlSlider
-      :model-value="props.progress"
+      :model-value="progress"
       :label="labels.progress"
       :min="0"
       :max="1"
@@ -54,7 +50,7 @@ const updateDuration = (value: number | undefined) => {
       @update:model-value="updateProgress"
     />
     <ControlSlider
-      :model-value="props.duration"
+      :model-value="duration"
       :label="labels.duration"
       :min="0.25"
       :max="2.5"
@@ -68,7 +64,7 @@ const updateDuration = (value: number | undefined) => {
 <style scoped>
 .transport-panel {
   display: grid;
-  gap: 18px;
+  gap: 22px;
 }
 
 .transport-actions {
@@ -79,13 +75,14 @@ const updateDuration = (value: number | undefined) => {
 
 .action-button {
   display: inline-flex;
-  min-height: 44px;
+  min-height: 46px;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 11px;
-  font-size: 13px;
-  font-weight: 700;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 680;
+  letter-spacing: 0.02em;
   transition:
     transform 160ms ease,
     background-color 160ms ease,
@@ -97,9 +94,9 @@ const updateDuration = (value: number | undefined) => {
 }
 
 .primary {
-  border: 1px solid var(--accent);
+  border: 1px solid var(--text-primary);
   background: var(--accent);
-  color: #f7fbff;
+  color: var(--page-bg);
 }
 
 .primary:hover {
@@ -114,7 +111,11 @@ const updateDuration = (value: number | undefined) => {
 }
 
 .secondary:hover {
-  border-color: var(--text-tertiary);
+  border-color: var(--text-secondary);
   background: var(--surface-raised);
+}
+
+.action-mark {
+  font: 500 16px/1 var(--font-mono);
 }
 </style>

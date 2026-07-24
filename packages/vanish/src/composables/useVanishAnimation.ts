@@ -1,18 +1,20 @@
-import { onBeforeUnmount, shallowRef } from 'vue'
+import { onBeforeUnmount, readonly, shallowRef } from 'vue'
 
 const smoothstep = (value: number) => value * value * (3 - 2 * value)
 
 export function useVanishAnimation(initialProgress = 0) {
   const progress = shallowRef(initialProgress)
   const isAnimating = shallowRef(false)
-  const prefersReducedMotion = window.matchMedia(
-    '(prefers-reduced-motion: reduce)',
-  )
+  const prefersReducedMotion = typeof window === 'undefined'
+    ? undefined
+    : window.matchMedia('(prefers-reduced-motion: reduce)')
 
   let frame = 0
 
   const stop = () => {
-    cancelAnimationFrame(frame)
+    if (typeof cancelAnimationFrame !== 'undefined') {
+      cancelAnimationFrame(frame)
+    }
     isAnimating.value = false
   }
 
@@ -26,7 +28,11 @@ export function useVanishAnimation(initialProgress = 0) {
     const from = progress.value
     const destination = Math.min(Math.max(target, 0), 1)
 
-    if (prefersReducedMotion.matches || Math.abs(from - destination) < 0.0001) {
+    if (
+      prefersReducedMotion?.matches
+      || typeof requestAnimationFrame === 'undefined'
+      || Math.abs(from - destination) < 0.0001
+    ) {
       progress.value = destination
       return
     }
@@ -53,8 +59,8 @@ export function useVanishAnimation(initialProgress = 0) {
   onBeforeUnmount(stop)
 
   return {
-    progress,
-    isAnimating,
+    progress: readonly(progress),
+    isAnimating: readonly(isAnimating),
     setProgress,
     animateTo,
   }

@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { PhDiceFive as DiceFive } from '@phosphor-icons/vue'
 import type {
   SourceSize,
   VanishConfiguration,
-} from '../../types/vanish'
+} from '@zyyv/vanish'
 import ControlSlider from './ControlSlider.vue'
 
 defineProps<{
@@ -40,8 +39,8 @@ const updateSourceSize = (
       <ControlSlider
         :model-value="sourceSize.width"
         :label="labels.sourceWidth"
-        :min="80"
-        :max="280"
+        :min="120"
+        :max="340"
         :step="1"
         suffix="px"
         @update:model-value="updateSourceSize('width', $event)"
@@ -49,8 +48,8 @@ const updateSourceSize = (
       <ControlSlider
         :model-value="sourceSize.height"
         :label="labels.sourceHeight"
-        :min="52"
-        :max="180"
+        :min="80"
+        :max="320"
         :step="1"
         suffix="px"
         @update:model-value="updateSourceSize('height', $event)"
@@ -179,7 +178,7 @@ const updateSourceSize = (
           )"
         />
         <button class="random-button" type="button" @click="emit('randomizeSeed')">
-          <DiceFive :size="17" weight="bold" />
+          <span class="random-mark" aria-hidden="true">✣</span>
           {{ labels.randomize }}
         </button>
       </div>
@@ -191,13 +190,13 @@ const updateSourceSize = (
 .parameter-panel {
   display: grid;
   gap: 0;
-  padding-block: 4px;
+  padding: 0;
 }
 
 .control-group {
   display: grid;
   gap: 16px;
-  padding: 20px;
+  padding: 24px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -206,11 +205,13 @@ const updateSourceSize = (
 }
 
 .group-title {
-  margin: 0 0 1px;
-  color: var(--text-primary);
-  font-size: 15px;
+  margin: 0 0 4px;
+  color: var(--text-tertiary);
+  font: 650 10px/1.2 var(--font-mono);
+  text-transform: uppercase;
+  font-size: 10px;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.12em;
 }
 
 .seed-row {
@@ -228,7 +229,7 @@ const updateSourceSize = (
 .seed-input {
   min-width: 0;
   border: 1px solid var(--border-strong);
-  border-radius: 8px;
+  border-radius: 3px;
   outline: none;
   background: var(--input-bg);
   color: var(--text-primary);
@@ -243,7 +244,7 @@ const updateSourceSize = (
   align-items: center;
   gap: 6px;
   border: 1px solid var(--border-strong);
-  border-radius: 9px;
+  border-radius: 3px;
   background: var(--input-bg);
   color: var(--text-primary);
   font-size: 12px;
@@ -253,5 +254,15 @@ const updateSourceSize = (
 
 .random-button:active {
   transform: scale(0.98);
+}
+
+.random-button:hover {
+  border-color: var(--text-secondary);
+  background: var(--surface-raised);
+}
+
+.random-mark {
+  color: var(--text-tertiary);
+  font-size: 14px;
 }
 </style>

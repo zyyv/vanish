@@ -7,13 +7,47 @@ settings:
 importers:
 
   .:
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.1
+        version: 6.0.8(vite@7.3.6)(vue@3.5.40(typescript@5.9.3))
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.1.7
+        version: 7.3.6
+      vue-tsc:
+        specifier: ^3.0.8
+        version: 3.3.8(typescript@5.9.3)
+
+  packages/vanish:
     dependencies:
-      '@phosphor-icons/vue':
-        specifier: ^2.2.1
-        version: 2.2.1(vue@3.5.40(typescript@5.9.3))
       html2canvas:
         specifier: ^1.4.1
         version: 1.4.1
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.1
+        version: 6.0.8(vite@7.3.6)(vue@3.5.40(typescript@5.9.3))
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.1.7
+        version: 7.3.6
+      vue:
+        specifier: ^3.5.21
+        version: 3.5.40(typescript@5.9.3)
+      vue-tsc:
+        specifier: ^3.0.8
+        version: 3.3.8(typescript@5.9.3)
+
+  playground:
+    dependencies:
+      '@zyyv/vanish':
+        specifier: workspace:*
+        version: link:../packages/vanish
       vue:
         specifier: ^3.5.21
         version: 3.5.40(typescript@5.9.3)
@@ -208,12 +242,6 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
-
-  '@phosphor-icons/vue@2.2.1':
-    resolution: {integrity: sha512-3RNg1utc2Z5RwPKWFkW3eXI/0BfQAwXgtFxPUPeSzi55jGYUq16b+UqcgbKLazWFlwg5R92OCLKjDiJjeiJcnA==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      vue: '>=3.2.39'
 
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
@@ -635,10 +663,6 @@ snapshots:
     optional: true
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
-
-  '@phosphor-icons/vue@2.2.1(vue@3.5.40(typescript@5.9.3))':
-    dependencies:
-      vue: 3.5.40(typescript@5.9.3)
 
   '@rolldown/pluginutils@1.0.1': {}
 

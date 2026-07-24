@@ -1,21 +1,15 @@
 <script setup lang="ts">
 import {
-  PhGithubLogo as GithubLogo,
-  PhMoon as Moon,
-  PhSparkle as Sparkle,
-  PhSun as Sun,
-} from '@phosphor-icons/vue'
-import { computed, reactive, shallowRef } from 'vue'
-import { useVanishAnimation } from '../../composables/useVanishAnimation'
-import {
+  VanishCanvas,
   defaultVanishConfiguration,
-  type DemoSource,
+  useVanishAnimation,
   type SourceSize,
   type VanishConfiguration,
-} from '../../types/vanish'
+} from '@zyyv/vanish'
+import { computed, reactive, shallowRef } from 'vue'
 import ParameterControls from './ParameterControls.vue'
+import SourcePreview, { type DemoSource } from './SourcePreview.vue'
 import TransportControls from './TransportControls.vue'
-import VanishCanvas from './VanishCanvas.vue'
 
 type Locale = 'zh' | 'en'
 
@@ -93,8 +87,11 @@ const source = shallowRef<DemoSource>('card')
 const duration = shallowRef(0.9)
 const particleCount = shallowRef(0)
 const rendererError = shallowRef('')
-const isDark = shallowRef(window.matchMedia('(prefers-color-scheme: dark)').matches)
-const sourceSize = reactive<SourceSize>({ width: 150, height: 96 })
+const sourceSizes: Record<DemoSource, SourceSize> = {
+  card: { width: 280, height: 168 },
+  image: { width: 236, height: 236 },
+}
+const sourceSize = reactive<SourceSize>({ ...sourceSizes.card })
 const configuration = reactive(defaultVanishConfiguration())
 const labels = computed(() => copies[locale.value])
 const formattedParticleCount = computed(() => (
@@ -110,6 +107,7 @@ const {
 
 const setSource = (value: DemoSource) => {
   source.value = value
+  Object.assign(sourceSize, sourceSizes[value])
   setProgress(0)
 }
 
@@ -131,8 +129,10 @@ const updateConfiguration = (
 }
 
 const updateSourceSize = (key: keyof SourceSize, value: number) => {
-  const range = key === 'width' ? [80, 280] : [52, 180]
-  sourceSize[key] = Math.min(Math.max(value, range[0]), range[1])
+  const range = key === 'width' ? [120, 340] : [80, 320]
+  const nextValue = Math.min(Math.max(value, range[0]), range[1])
+  sourceSize[key] = nextValue
+  sourceSizes[source.value][key] = nextValue
   setProgress(0)
 }
 
@@ -145,37 +145,26 @@ const randomizeSeed = () => {
 </script>
 
 <template>
-  <main class="app-shell" :data-theme="isDark ? 'dark' : 'light'">
+  <main class="app-shell" data-theme="dark">
     <header class="topbar">
       <div class="brand-block">
         <div class="brand-line">
-          <span class="brand-mark" aria-hidden="true">
-            <Sparkle :size="16" weight="fill" />
-          </span>
-          <h1>VanishKit</h1>
+          <span class="brand-mark" aria-hidden="true" />
+          <h1>Vanish<span class="brand-quiet">/lab</span></h1>
         </div>
         <p>{{ labels.subtitle }}</p>
       </div>
 
       <nav class="top-actions" aria-label="Page controls">
         <a
-          class="icon-button"
-          href="https://github.com/jhao941/VanishKit"
+          class="source-link"
+          href="https://github.com/zyyv/vanish"
           target="_blank"
           rel="noreferrer"
-          aria-label="Original VanishKit repository"
+          aria-label="Vanish repository"
         >
-          <GithubLogo :size="18" weight="bold" />
+          GitHub <span aria-hidden="true">↗</span>
         </a>
-        <button
-          class="icon-button"
-          type="button"
-          :aria-label="isDark ? 'Use light theme' : 'Use dark theme'"
-          @click="isDark = !isDark"
-        >
-          <Sun v-if="isDark" :size="18" weight="bold" />
-          <Moon v-else :size="18" weight="bold" />
-        </button>
         <button
           class="locale-button"
           type="button"
@@ -190,7 +179,7 @@ const randomizeSeed = () => {
       <section class="preview-column">
         <div class="preview-heading">
           <div class="preview-title">
-            <Sparkle :size="18" weight="fill" />
+            <span class="live-dot" aria-hidden="true" />
             <h2>{{ labels.liveRendering }}</h2>
           </div>
           <div class="particle-counter">
@@ -216,11 +205,19 @@ const randomizeSeed = () => {
           <VanishCanvas
             :progress="progress"
             :configuration="configuration"
-            :source="source"
             :source-size="sourceSize"
+            :capture-key="source"
             @particle-count="particleCount = $event"
             @error="rendererError = $event"
-          />
+          >
+            <template #default="{ recapture }">
+              <SourcePreview
+                :source="source"
+                :size="sourceSize"
+                @ready="recapture"
+              />
+            </template>
+          </VanishCanvas>
           <div v-if="rendererError" class="renderer-error" role="alert">
             <strong>{{ labels.renderingError }}</strong>
             <span>{{ rendererError }}</span>
@@ -258,15 +255,16 @@ const randomizeSeed = () => {
   min-height: 100dvh;
   background: var(--page-bg);
   color: var(--text-primary);
-  transition:
-    background-color 220ms ease,
-    color 220ms ease;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 .topbar {
   display: flex;
-  width: min(1280px, calc(100% - 48px));
-  min-height: 82px;
+  width: min(1360px, calc(100% - 64px));
+  min-height: 92px;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
@@ -287,25 +285,51 @@ const randomizeSeed = () => {
 
 .brand-line h1 {
   margin: 0;
-  font-size: 21px;
+  font-size: 22px;
+  font-weight: 680;
   line-height: 1;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.045em;
 }
 
 .brand-mark {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border-radius: 9px;
-  background: var(--accent);
-  color: #f7fbff;
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--text-primary);
+  border-radius: 50%;
+}
+
+.brand-mark::before,
+.brand-mark::after {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  content: "";
+}
+
+.brand-mark::before {
+  top: 3px;
+  right: -3px;
+}
+
+.brand-mark::after {
+  right: -6px;
+  bottom: 3px;
+  opacity: 0.38;
+}
+
+.brand-quiet {
+  color: var(--text-tertiary);
+  font-weight: 450;
 }
 
 .brand-block p {
-  margin: 0 0 0 37px;
+  margin: 0 0 0 31px;
   color: var(--text-tertiary);
-  font-size: 11px;
+  font: 450 10px/1.3 var(--font-mono);
+  letter-spacing: 0.025em;
 }
 
 .top-actions {
@@ -314,14 +338,14 @@ const randomizeSeed = () => {
   gap: 7px;
 }
 
-.icon-button,
+.source-link,
 .locale-button {
   display: grid;
-  min-width: 36px;
-  height: 36px;
+  min-width: 42px;
+  height: 34px;
   place-items: center;
   border: 1px solid var(--border-strong);
-  border-radius: 10px;
+  border-radius: 3px;
   background: var(--surface);
   color: var(--text-secondary);
   transition:
@@ -330,31 +354,38 @@ const randomizeSeed = () => {
     border-color 160ms ease;
 }
 
+.source-link {
+  grid-auto-flow: column;
+  gap: 7px;
+  padding: 0 10px;
+  font: 600 10px/1 var(--font-mono);
+}
+
 .locale-button {
   width: auto;
   padding: 0 11px;
-  font: 700 11px/1 var(--font-sans);
+  font: 650 10px/1 var(--font-mono);
 }
 
-.icon-button:hover,
+.source-link:hover,
 .locale-button:hover {
-  border-color: var(--text-tertiary);
+  border-color: var(--text-secondary);
   background: var(--surface-raised);
 }
 
-.icon-button:active,
+.source-link:active,
 .locale-button:active {
   transform: scale(0.97);
 }
 
 .workspace {
   display: grid;
-  width: min(1280px, calc(100% - 48px));
-  grid-template-columns: minmax(0, 1.5fr) minmax(340px, 0.78fr);
+  width: min(1360px, calc(100% - 64px));
+  grid-template-columns: minmax(0, 1.65fr) minmax(360px, 0.7fr);
   align-items: start;
-  gap: 28px;
+  gap: 40px;
   margin: 0 auto;
-  padding: 32px 0 56px;
+  padding: 40px 0 72px;
 }
 
 .preview-column {
@@ -368,21 +399,30 @@ const randomizeSeed = () => {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .preview-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: var(--accent);
+  gap: 10px;
 }
 
 .preview-title h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 15px;
-  letter-spacing: -0.015em;
+  font-size: 13px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.07);
+  animation: live-pulse 2.4s ease-in-out infinite;
 }
 
 .particle-counter {
@@ -392,33 +432,34 @@ const randomizeSeed = () => {
 }
 
 .particle-counter strong {
-  font: 650 12px/1 var(--font-mono);
+  font: 560 13px/1 var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
 .particle-counter span {
   color: var(--text-tertiary);
-  font-size: 10px;
+  font: 450 9px/1.2 var(--font-mono);
+  letter-spacing: 0.04em;
 }
 
 .source-switcher {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3px;
-  margin-bottom: 12px;
+  gap: 1px;
+  margin-bottom: 10px;
   border: 1px solid var(--border);
-  border-radius: 11px;
+  border-radius: 4px;
   background: var(--segmented-bg);
-  padding: 3px;
+  padding: 2px;
 }
 
 .source-option {
-  min-height: 34px;
+  min-height: 32px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 2px;
   background: transparent;
   color: var(--text-tertiary);
-  font-size: 12px;
+  font: 600 10px/1 var(--font-mono);
   font-weight: 650;
   transition:
     background-color 160ms ease,
@@ -427,8 +468,8 @@ const randomizeSeed = () => {
 }
 
 .source-option.active {
-  background: var(--surface);
-  color: var(--text-primary);
+  background: var(--text-primary);
+  color: var(--page-bg);
   box-shadow: var(--segment-shadow);
 }
 
@@ -458,24 +499,31 @@ const randomizeSeed = () => {
 
 .canvas-note {
   max-width: 72ch;
-  margin: 10px 2px 0;
+  margin: 12px 2px 0;
   color: var(--text-tertiary);
-  font-size: 11px;
+  font: 450 10px/1.6 var(--font-mono);
   line-height: 1.5;
 }
 
 .controls-column {
   display: grid;
   min-width: 0;
-  gap: 16px;
+  gap: 12px;
 }
 
 .panel {
   border: 1px solid var(--border);
-  border-radius: 17px;
+  border-radius: 6px;
   background: var(--surface);
   box-shadow: var(--panel-shadow);
-  padding: 20px;
+  padding: 24px;
+}
+
+@keyframes live-pulse {
+  50% {
+    opacity: 0.5;
+    transform: scale(0.78);
+  }
 }
 
 @media (max-width: 920px) {
@@ -491,7 +539,7 @@ const randomizeSeed = () => {
 @media (max-width: 600px) {
   .topbar,
   .workspace {
-    width: min(100% - 28px, 1280px);
+    width: min(100% - 28px, 1360px);
   }
 
   .topbar {

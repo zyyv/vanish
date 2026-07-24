@@ -1,5 +1,3 @@
-export type DemoSource = 'card' | 'image'
-
 export interface VanishConfiguration {
   particleSize: number
   direction: number

@@ -7,24 +7,26 @@ import {
   useTemplateRef,
   watch,
 } from 'vue'
-import { WebGLVanishRenderer } from '../../lib/webglVanishRenderer'
+import { WebGLVanishRenderer } from '../lib/webglVanishRenderer'
 import type {
-  DemoSource,
   SourceSize,
   VanishConfiguration,
-} from '../../types/vanish'
-import SourcePreview from './SourcePreview.vue'
+} from '../types'
 
 const props = defineProps<{
   progress: number
   configuration: VanishConfiguration
-  source: DemoSource
   sourceSize: SourceSize
+  captureKey?: unknown
 }>()
 
 const emit = defineEmits<{
   particleCount: [count: number]
   error: [message: string]
+}>()
+
+defineSlots<{
+  default(props: { recapture: () => Promise<void> }): unknown
 }>()
 
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvas')
@@ -98,7 +100,7 @@ watch(
 )
 
 watch(
-  () => [props.source, props.sourceSize.width, props.sourceSize.height],
+  () => [props.captureKey, props.sourceSize.width, props.sourceSize.height],
   () => {
     void captureSource()
   },
@@ -114,11 +116,7 @@ onBeforeUnmount(() => {
   <div class="render-stage">
     <canvas ref="canvas" class="render-canvas" />
     <div ref="source" class="capture-source" aria-hidden="true">
-      <SourcePreview
-        :source="source"
-        :size="sourceSize"
-        @ready="captureSource"
-      />
+      <slot :recapture="captureSource" />
     </div>
   </div>
 </template>

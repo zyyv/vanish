@@ -1,13 +1,15 @@
 <script setup lang="ts">
 const model = defineModel<number>({ required: true })
 
-defineProps<{
+interface ControlSliderProps {
   label: string
   min: number
   max: number
   step: number
   suffix?: string
-}>()
+}
+
+defineProps<ControlSliderProps>()
 </script>
 
 <template>
@@ -40,7 +42,7 @@ defineProps<{
 <style scoped>
 .control-slider {
   display: grid;
-  gap: 9px;
+  gap: 11px;
 }
 
 .control-topline {
@@ -52,9 +54,9 @@ defineProps<{
 }
 
 .control-label {
-  color: var(--text-primary);
-  font-size: 13px;
-  font-weight: 560;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 520;
 }
 
 .value-wrap {
@@ -66,11 +68,11 @@ defineProps<{
 .value-input {
   width: 72px;
   border: 1px solid var(--border-strong);
-  border-radius: 8px;
+  border-radius: 3px;
   outline: none;
   background: var(--input-bg);
   color: var(--text-primary);
-  font: 600 12px/1 var(--font-mono);
+  font: 550 11px/1 var(--font-mono);
   padding: 7px 8px;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -91,10 +93,41 @@ defineProps<{
 }
 
 .range-input {
+  --range-progress: 50%;
   width: 100%;
-  height: 18px;
+  height: 14px;
   margin: 0;
   cursor: pointer;
-  accent-color: var(--accent);
+  accent-color: var(--text-primary);
+}
+
+.range-input::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--border-strong);
+}
+
+.range-input::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  margin-top: -5px;
+  border: 2px solid var(--page-bg);
+  border-radius: 50%;
+  background: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--text-primary);
+  appearance: none;
+}
+
+.range-input::-moz-range-track {
+  height: 2px;
+  background: var(--border-strong);
+}
+
+.range-input::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--page-bg);
+  border-radius: 50%;
+  background: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--text-primary);
 }
 </style>
